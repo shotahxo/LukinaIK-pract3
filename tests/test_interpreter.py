@@ -36,6 +36,20 @@ class RangeTest(unittest.TestCase):
                     parse_range(text, MEMORY)
 
 
+class SqrtProgramTest(FixtureCase):
+    """Тестовая программа для SQRT."""
+
+    def test_sqrt_results(self):
+        """Корни из 0, 1, 10, 144, 10**6 записаны в ячейки 40–44."""
+        program = self.temp_path("sqrt.bin")
+        dump = self.temp_path("sqrt.csv")
+        source = os.path.join(EXAMPLES, "sqrt_test.asm")
+        assembler.main([source, program], io.StringIO())
+        interpreter.main([program, dump, "40-44"], io.StringIO())
+        self.assertEqual(list(read_dump(dump).values()),
+                         [0, 1, 3, 12, 1000])
+
+
 class InterpreterTest(FixtureCase):
     """Запуск интерпретатора через main()."""
 

@@ -1,4 +1,4 @@
-"""Тесты виртуальной машины: команды LOAD, READ, WRITE."""
+"""Тесты виртуальной машины: команды LOAD, READ, WRITE, SQRT."""
 
 import unittest
 
@@ -32,6 +32,21 @@ class MachineTest(unittest.TestCase):
         """READ берёт mem[mem[C] + B]."""
         machine = run_source("LOAD 9, 42\nLOAD 0, 5\nREAD 4, 0, 1")
         self.assertEqual(machine.data[1], 42)
+
+    def test_sqrt_through_pointer(self):
+        """SQRT пишет корень по адресу из ячейки C."""
+        machine = run_source("LOAD 1, 144\nLOAD 2, 7\nSQRT 1, 2")
+        self.assertEqual(machine.data[7], 12)
+
+    def test_sqrt_takes_integer_part(self):
+        """Для неточного квадрата берётся целая часть корня."""
+        machine = run_source("LOAD 1, 10\nLOAD 2, 3\nSQRT 1, 2")
+        self.assertEqual(machine.data[3], 3)
+
+    def test_sqrt_bad_pointer(self):
+        """Указатель за пределами памяти — ошибка."""
+        with self.assertRaisesRegex(VmError, "вне памяти данных"):
+            run_source("LOAD 2, 500\nSQRT 1, 2")
 
     def test_memories_are_separate(self):
         """Запись в данные не меняет память команд."""

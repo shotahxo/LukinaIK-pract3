@@ -1,5 +1,7 @@
 """Модель УВМ: раздельные память команд и память данных, цикл работы."""
 
+import math
+
 from .decoder import decode
 from .spec import COMMAND_SIZE
 
@@ -24,6 +26,7 @@ class Machine:
             "LOAD": self.op_load,
             "READ": self.op_read,
             "WRITE": self.op_write,
+            "SQRT": self.op_sqrt,
         }
 
     def check_address(self, address):
@@ -52,6 +55,10 @@ class Machine:
     def op_write(self, b, c):
         """WRITE: mem[C] = mem[B]."""
         self.store(c, self.load(b))
+
+    def op_sqrt(self, b, c):
+        """SQRT: mem[mem[C]] = sqrt(mem[B]), целая часть корня."""
+        self.store(self.load(c), math.isqrt(self.load(b)))
 
     def fetch(self):
         """Прочитать команду по счётчику и перевести её в промежуточный вид."""
