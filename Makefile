@@ -8,6 +8,7 @@ test:
 
 spec:
 	./run.sh asm examples/spec_tests.asm output/spec_tests.bin --test
+	od -An -tx1 output/spec_tests.bin
 
 errors:
 	./scripts/check_asm_errors.sh

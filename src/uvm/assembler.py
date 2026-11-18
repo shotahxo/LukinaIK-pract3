@@ -1,8 +1,10 @@
-"""Ассемблер УВМ: ``python3 -m uvm.assembler ИСХОДНИК РЕЗУЛЬТАТ [--test]``."""
+"""Ассемблер УВМ: ``python3 -m uvm.assembler SRC OUT [--test]``."""
 
 import argparse
+import os
 import sys
 
+from .encoder import encode, encode_program, format_bytes
 from .parser import AsmError, parse_program
 
 EXIT_OK = 0
@@ -16,7 +18,7 @@ def build_parser():
     parser.add_argument("source", help="файл с текстом программы (.asm)")
     parser.add_argument("output", help="двоичный файл-результат (.bin)")
     parser.add_argument("-t", "--test", action="store_true",
-                        help="режим тестирования: показать поля команд")
+                        help="режим тестирования: показать поля и байты")
     return parser
 
 
@@ -26,11 +28,21 @@ def read_source(path):
         return handle.read()
 
 
-def print_fields(program, out):
-    """Вывести промежуточное представление в формате «поле=значение»."""
+def print_test_view(program, out):
+    """Вывести поля и байты каждой команды, как в спецификации."""
     for instruction in program:
         print(f"{instruction.mnemonic:<6} {instruction.describe()}",
               file=out)
+        print(f"{'':<6} {format_bytes(encode(instruction))}", file=out)
+
+
+def write_binary(path, code):
+    """Записать машинный код в двоичный файл (каталог создаётся)."""
+    folder = os.path.dirname(path)
+    if folder:
+        os.makedirs(folder, exist_ok=True)
+    with open(path, "wb") as handle:
+        handle.write(code)
 
 
 def main(argv=None, out=None, err=None):
@@ -48,7 +60,14 @@ def main(argv=None, out=None, err=None):
         print(f"Ошибка в {args.source}, {problem}", file=err)
         return EXIT_ERROR
     if args.test:
-        print_fields(program, out)
+        print_test_view(program, out)
+    try:
+        write_binary(args.output, encode_program(program))
+    except OSError as problem:
+        print(f"Ошибка: не удалось записать {args.output}: "
+              f"{problem.strerror}", file=err)
+        return EXIT_ERROR
+    print(f"Ассемблировано команд: {len(program)}", file=out)
     return EXIT_OK
 
 
