@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Результаты сборки и выполнения программ УВМ
+*.bin
+output/
+build/
+dist/
+
+# Редакторы и ОС
+.vscode/
+.idea/
+.DS_Store
