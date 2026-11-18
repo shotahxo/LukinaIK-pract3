@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := src:tests
 
-.PHONY: test spec errors copy sqrt
+.PHONY: test spec errors copy sqrt vectors
 
 test:
 	$(PYTHON) -m unittest discover -s tests -v
@@ -22,3 +22,6 @@ sqrt:
 	./run.sh asm examples/sqrt_test.asm output/sqrt_test.bin
 	./run.sh run output/sqrt_test.bin output/sqrt_test.csv 20-44
 	grep -E '^(2[0-4]|4[0-4]),' output/sqrt_test.csv
+
+vectors:
+	./scripts/check_vectors.sh

@@ -31,7 +31,7 @@ def save_dump(path, data, start, end):
     if folder:
         os.makedirs(folder, exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerow(HEADER)
         for address in range(start, end + 1):
             writer.writerow((address, data[address]))
